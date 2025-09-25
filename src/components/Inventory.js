@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function Inventory({ products, addProduct, editProduct, deleteProduct, recordSale }) {
+function Inventory({ products, addProduct, editProduct, deleteProduct }) {
   const [editProductId, setEditProductId] = useState(null);
   const [editedProduct, setEditedProduct] = useState({});
   const [newProduct, setNewProduct] = useState({
@@ -9,17 +9,19 @@ function Inventory({ products, addProduct, editProduct, deleteProduct, recordSal
     price: "",
     image: null,
   });
-  const [sellQuantity, setSellQuantity] = useState({}); 
 
-  
   const startEdit = (product) => {
     setEditProductId(product.id);
     setEditedProduct({ ...product });
   };
 
-  
   const saveEdit = () => {
-    editProduct(editedProduct);
+    const updated = {
+      ...editedProduct,
+      price: Number(editedProduct.price),
+      quantity: Number(editedProduct.quantity),
+    };
+    editProduct(updated);
     setEditProductId(null);
   };
 
@@ -31,7 +33,6 @@ function Inventory({ products, addProduct, editProduct, deleteProduct, recordSal
     }
   };
 
-  
   const handleAddProduct = (e) => {
     e.preventDefault();
     if (!newProduct.image) return alert("Please select an image");
@@ -42,24 +43,12 @@ function Inventory({ products, addProduct, editProduct, deleteProduct, recordSal
         id: Date.now(),
         price: Number(newProduct.price),
         quantity: Number(newProduct.quantity),
-        image: base64Image, 
+        image: base64Image,
       };
 
       addProduct(productToAdd);
-
-      
       setNewProduct({ name: "", quantity: "", price: "", image: null });
     });
-  };
-
-  
-  const handleSell = (product) => {
-    const qty = Number(sellQuantity[product.id]);
-    if (!qty || qty <= 0) return alert("Enter a valid quantity");
-    if (qty > product.quantity) return alert("Not enough stock!");
-
-    recordSale(product.id, qty); 
-    setSellQuantity({ ...sellQuantity, [product.id]: "" });
   };
 
   return (
@@ -76,7 +65,6 @@ function Inventory({ products, addProduct, editProduct, deleteProduct, recordSal
               <th>Name</th>
               <th>Quantity</th>
               <th>Price</th>
-              <th>Sell</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -130,19 +118,6 @@ function Inventory({ products, addProduct, editProduct, deleteProduct, recordSal
                   )}
                 </td>
                 <td>
-                  <input
-                    type="number"
-                    min="1"
-                    placeholder="Qty"
-                    value={sellQuantity[p.id] || ""}
-                    onChange={(e) =>
-                      setSellQuantity({ ...sellQuantity, [p.id]: e.target.value })
-                    }
-                    style={{ width: "60px" }}
-                  />
-                  <button onClick={() => handleSell(p)}>Sell</button>
-                </td>
-                <td>
                   {editProductId === p.id ? (
                     <>
                       <button onClick={saveEdit}>Save</button>
@@ -161,7 +136,6 @@ function Inventory({ products, addProduct, editProduct, deleteProduct, recordSal
         </table>
       )}
 
-      
       <h2 style={{ marginTop: "30px" }}>Add New Product</h2>
       <form onSubmit={handleAddProduct} className="add-product-form">
         <input
@@ -190,7 +164,9 @@ function Inventory({ products, addProduct, editProduct, deleteProduct, recordSal
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setNewProduct({ ...newProduct, image: e.target.files[0] })}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, image: e.target.files[0] })
+            }
             required
           />
         </label>

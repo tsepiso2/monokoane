@@ -7,7 +7,6 @@ import Report from "./components/Report";
 import "./App.css";
 
 function App() {
-  
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem("products");
     return saved
@@ -24,7 +23,6 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  
   useEffect(() => {
     localStorage.setItem("products", JSON.stringify(products));
   }, [products]);
@@ -33,15 +31,21 @@ function App() {
     localStorage.setItem("sales", JSON.stringify(sales));
   }, [sales]);
 
-
   const fileToBase64 = (file, callback) => {
     const reader = new FileReader();
     reader.onloadend = () => callback(reader.result);
     if (file) reader.readAsDataURL(file);
   };
 
-  
+  // Add product with unique name check
   const addProduct = (product) => {
+    const exists = products.some(
+      (p) => p.name.toLowerCase() === product.name.toLowerCase()
+    );
+    if (exists) {
+      return alert("A product with this name already exists!");
+    }
+
     if (product.image instanceof File) {
       fileToBase64(product.image, (base64) => {
         const newProduct = { ...product, id: Date.now(), image: base64 };
@@ -52,21 +56,47 @@ function App() {
     }
   };
 
-  
+  // Edit product and save edit history
   const editProduct = (updatedProduct) => {
-    setProducts(products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)));
+    setProducts((prevProducts) => {
+      const oldProduct = prevProducts.find((p) => p.id === updatedProduct.id);
+      if (!oldProduct) return prevProducts;
+
+      const newProducts = prevProducts.map((p) =>
+        p.id === updatedProduct.id ? updatedProduct : p
+      );
+
+      // Save edit log
+      const edits = JSON.parse(localStorage.getItem("edits")) || [];
+      edits.push({
+        id: updatedProduct.id,
+        name: updatedProduct.name,
+        oldQuantity: oldProduct.quantity,
+        newQuantity: updatedProduct.quantity,
+        oldPrice: oldProduct.price,
+        newPrice: updatedProduct.price,
+        date: new Date().toLocaleString(),
+      });
+      localStorage.setItem("edits", JSON.stringify(edits));
+
+      return newProducts;
+    });
   };
 
-  
-  const deleteProduct = (id) => setProducts(products.filter((p) => p.id !== id));
+  const deleteProduct = (id) =>
+    setProducts(products.filter((p) => p.id !== id));
 
-  
+  // Pass recordSale into Sales instead of Inventory
   const recordSale = (productId, quantitySold) => {
     const product = products.find((p) => p.id === productId);
-    if (!product || product.quantity < quantitySold) return alert("Not enough stock!");
+    if (!product || product.quantity < quantitySold)
+      return alert("Not enough stock!");
 
-    const updatedProduct = { ...product, quantity: product.quantity - quantitySold };
-    editProduct(updatedProduct); 
+    const updatedProduct = {
+      ...product,
+      quantity: product.quantity - quantitySold,
+    };
+    editProduct(updatedProduct);
 
     setSales([
       ...sales,
@@ -82,7 +112,6 @@ function App() {
   return (
     <Router>
       <div className="App">
-      
         <nav className="navbar">
           <h2> Wings Cafe</h2>
           <ul>
@@ -93,7 +122,6 @@ function App() {
           </ul>
         </nav>
 
-      
         <Routes>
           <Route path="/" element={<Dashboard products={products} />} />
           <Route
@@ -102,20 +130,32 @@ function App() {
               <Inventory
                 products={products}
                 addProduct={addProduct}
-                editProduct={editProduct} 
+                editProduct={editProduct}
                 deleteProduct={deleteProduct}
+              />
+            }
+          />
+          <Route
+            path="/sales"
+            element={
+              <Sales
+                salesProp={sales}
+                products={products}
                 recordSale={recordSale}
               />
             }
           />
-          <Route path="/sales" element={<Sales sales={sales} />} />
-          <Route path="/report" element={<Report products={products} sales={sales} />} />
+          <Route
+            path="/report"
+            element={<Report products={products} sales={sales} />}
+          />
         </Routes>
 
-        
         <footer className="footer">
-          © 2025 Wings Cafe | All rights reserved
+          © 2025 Wings Cafe | Spending money on us is not such a bad idea.
+                 Contact us at:+266 69175507.
         </footer>
+        
       </div>
     </Router>
   );

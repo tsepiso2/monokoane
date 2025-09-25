@@ -4,7 +4,7 @@ import "./Dashboard.css";
 function Dashboard({ products }) {
   return (
     <div className="dashboard">
-      <h1>Our delicious deals </h1>
+      <h1> Have a taste of our amazing delicacies </h1>
       <div className="product-grid">
         {products.length === 0 ? (
           <p>No products available</p>
