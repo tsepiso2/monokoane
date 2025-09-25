@@ -12,9 +12,11 @@ function App() {
     return saved
       ? JSON.parse(saved)
       : [
-          { id: 1, name: "Apple", quantity: 50, price: 4, image: "./apple.jpg" },
-          { id: 2, name: "Banana", quantity: 30, price: 4, image: "./banana.jpg" },
-          { id: 3, name: "Orange", quantity: 20, price: 4, image: "./orange.jpg" },
+          { "id": 1, "name": "Slide", "quantity": 50, "price": 2, "image": "./slide.jpg" },
+          { "id": 2, "name": "scones", "quantity": 30, "price": 5.5, "image": "./scones.jpg" },
+          { "id": 3, "name": "water", "quantity": 20, "price": 5, "image": "./water.jpg" },
+          { "id": 3, "name": "simba", "quantity": 20, "price": 14, "image": "./simba.jpg" },
+          { "id": 3, "name": "tea", "quantity": 20, "price": 12.5, "image": "./tea.jpg" },
         ];
   });
 
