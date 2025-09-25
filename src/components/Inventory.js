@@ -160,7 +160,7 @@ function Inventory({ products, addProduct, editProduct, deleteProduct }) {
           required
         />
         <label className="custom-file-upload">
-          {newProduct.image ? "Image Selected ✅" : "Select Image"}
+          {newProduct.image ? "Image Selected " : "Select Image"}
           <input
             type="file"
             accept="image/*"
@@ -170,7 +170,7 @@ function Inventory({ products, addProduct, editProduct, deleteProduct }) {
             required
           />
         </label>
-        <button type="submit">Add Product</button>
+        <button type="submit">Add your Product</button>
       </form>
     </div>
   );
