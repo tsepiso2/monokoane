@@ -3,9 +3,8 @@
 body {
   margin: 0;
   font-family: 'Montserrat', sans-serif;
-  background-image: url(C:\Users\DELL\Desktop\stock-inventory\public\images.jpg);
-  background-repeat: no-repeat;
-  background-size: cover;
+  
+  background:gray;
   color: #2C1810;
   min-height: 100vh;
 }
